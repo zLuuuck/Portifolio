@@ -1,40 +1,99 @@
+import React, { useEffect, useRef, useState } from "react";
+
+const sections = ["Início", "Sobre Mim", "Projetos", "Contato"];
+
 function Navbar() {
-    return (
-        <div>
-            <nav className="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
-                <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-                    <a href="https://www.linkedin.com/in/lucastoterol/" target="_blank" className="flex items-center space-x-3 rtl:space-x-reverse">
-                        <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Lucas</span>
-                    </a>
-                    <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-                        <a href="https://linktr.ee/zluuuck"><button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Me Contrate</button></a>
-                        <button data-collapse-toggle="navbar-sticky" type="button" className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-sticky" aria-expanded="false">
-                            <span className="sr-only">Open main menu</span>
-                            <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15" />
-                            </svg>
-                        </button>
-                    </div>
-                    <div className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
-                        <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-                            <li>
-                                <a href="#section-0" className="block py-2 px-3 text-white bg-blue-700 rounded-sm md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500" aria-current="page">Início</a>
-                            </li>
-                            <li>
-                                <a href="#section-1" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Sobre Mim</a>
-                            </li>
-                            <li>
-                                <a href="#section-2" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Projetos</a>
-                            </li>
-                            <li>
-                                <a href="#section-3" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Contato</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const indicatorRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + window.innerHeight / 2;
+
+      const newIndex = sections.findIndex((_, i) => {
+        const section = document.getElementById(`section-${i}`);
+        if (!section) return false;
+        const top = section.offsetTop;
+        const bottom = top + section.offsetHeight;
+        return scrollPosition >= top && scrollPosition < bottom;
+      });
+
+      if (newIndex !== -1 && newIndex !== activeIndex) {
+        setActiveIndex(newIndex);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [activeIndex]);
+
+  useEffect(() => {
+    const targetIndex = hoveredIndex ?? activeIndex;
+    const target = itemRefs.current[targetIndex];
+
+    if (target && indicatorRef.current) {
+      indicatorRef.current.style.left = `${target.offsetLeft}px`;
+      indicatorRef.current.style.width = `${target.offsetWidth}px`;
+    }
+  }, [activeIndex, hoveredIndex]);
+
+  return (
+    <nav className="bg-[#0a0f1c] dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-800">
+      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+        <a
+          href="https://www.linkedin.com/in/lucastoterol/"
+          target="_blank"
+          className="flex items-center space-x-3 rtl:space-x-reverse"
+        >
+          <span className="self-center text-2xl font-semibold whitespace-nowrap text-white">
+            Lucas
+          </span>
+        </a>
+        <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+          <a href="https://linktr.ee/zluuuck" target="_blank">
+            <button
+              type="button"
+              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              Me Contrate
+            </button>
+          </a>
         </div>
-    );
-};
+        <div
+          className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1 relative"
+          id="navbar-sticky"
+        >
+          <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-800 rounded-lg bg-[#1c1f26] md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-transparent dark:bg-gray-800 md:dark:bg-transparent">
+            {sections.map((title, i) => (
+              <li
+                key={i}
+                ref={(el) => {
+                  itemRefs.current[i] = el;
+                }}
+                onMouseEnter={() => setHoveredIndex(i)}
+                onMouseLeave={() => setHoveredIndex(null)}
+              >
+                <a
+                  href={`#section-${i}`}
+                  className="block py-2 px-3 text-white hover:text-blue-400 transition-colors"
+                >
+                  {title}
+                </a>
+              </li>
+            ))}
+            <div
+              ref={indicatorRef}
+              className="absolute bottom-0 h-[3px] bg-white transition-all duration-300"
+            />
+          </ul>
+        </div>
+      </div>
+    </nav>
+  );
+}
 
 export default Navbar;
