@@ -79,7 +79,7 @@ function Navbar() {
               >
                 <a
                   href={`#section-${i}`}
-                  className="block py-2 px-3 text-white hover:text-blue-400 transition-colors"
+                  className="block py-2 px-3 text-white hover:text-gray-400 transition-colors"
                 >
                   {title}
                 </a>
